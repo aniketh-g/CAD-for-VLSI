@@ -1,2 +1,3 @@
 # CAD-for-VLSI
-Final project for the course CS6230: CAD for VLSI Systems
+## Problem Statement:
+Design, implement and test a **Pipelined 64 bit signed Integer Multiply and Accumulate (IMAC)** unit using Bluespec SystemVerilog
