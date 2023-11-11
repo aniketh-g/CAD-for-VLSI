@@ -30,12 +30,17 @@ function Bit#(n) gen_sum(Bit#(n) snew_prev, Bit#(n) s, Bit#(n) cin);
 endfunction
 
 // Pipelined Multiplier
-module mkUSMult16(Ifc_IMAC#(n, m))
+module mkIMAc(Ifc_IMAC#(n, m))
     provisos(Add#(1, b__, n));
-    Reg#(MultState)                  state <- mkReg(Idle);
+    Reg#(MultState) state <- mkReg(Idle);
     FIFO#(Maybe#(Bit#(TAdd#(n, m)))) product <- mkFIFO;
-    Reg#(Bit#(n))                    a <- mkReg(0);
-    Reg#(Bit#(m))                    b <- mkReg(0);
+    
+    Reg#(Bit#(n)) a <- mkReg(0);
+    Reg#(Bit#(m)) b <- mkReg(0);
+
+    Reg#(Bit#(m)) preg_1_array_sum <- mkReg(0);
+    Reg#(Bit#(TSub#(n,1))) preg_1_snew <- mkReg(0);
+    Reg#(Bit#(n)) preg_1_carries <- mkReg(0);
 
     rule idle (state == Idle);
         product.clear();
@@ -73,7 +78,7 @@ module mkUSMult16(Ifc_IMAC#(n, m))
         end
 
         snew[0] = s[0];
-        Bit#(TSub#(m,0)) array_sum = 0;
+        Bit#(m) array_sum = 0;
         for(Integer v = 0; v < valueOf(m); v = v + 1)
             if(v != valueOf(m) - 1) begin
                 array_sum[v] = snew[v][0];
@@ -91,10 +96,13 @@ module mkUSMult16(Ifc_IMAC#(n, m))
                 `ifdef debug_functionality $display("carries[%d] = %b, snew[%d] = %b", v, carries[v], v, snew[v]); `endif
             end
 
-        Bit#(n) ripple_sum = {`SIGN, snew[valueOf(m)-1][valueOf(n)-1:1]}+carries[valueOf(m)-1];
+        preg_1_array_sum <= array_sum;
+        preg_1_snew      <= snew[valueOf(m)-1][valueOf(n)-1:1];
+        preg_1_carries   <= carries[valueOf(m)-1];
+        Bit#(n) ripple_sum = {`SIGN, preg_1_snew}+preg_1_carries;
         `ifdef debug_functionality $display("fs:%ba:%b", ripple_sum, array_sum); `endif
         
-        let p = {ripple_sum, array_sum};
+        let p = {ripple_sum, preg_1_array_sum};
         product.enq(tagged Valid p);
     endrule : compute
 
@@ -114,5 +122,5 @@ module mkUSMult16(Ifc_IMAC#(n, m))
         return fromMaybe(?, ans);
     endmethod
 
-endmodule : mkUSMult16
+endmodule : mkIMAc
 endpackage : multiplier
