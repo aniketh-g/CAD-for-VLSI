@@ -15,9 +15,11 @@ typedef struct {
 
 interface Ifc_IMAC#(numeric type n, numeric type m);
     method Action start(Bit#(n) inpA, Bit#(m) inpB);
-    method ActionValue#(Bit#(TAdd#(n, m))) result;
+    method Bit#(TAdd#(n,m)) result;
+	method Action rst;
+	method Bit#(1) isRdy;
 endinterface : Ifc_IMAC
 
-typedef enum {Idle, Compute, Finish} MultState deriving (Bits, Eq);
+typedef enum {Idle, Compute_Mult, Compute_Add, Finish} MultState deriving (Bits, Eq);
 
 endpackage : imac_types
