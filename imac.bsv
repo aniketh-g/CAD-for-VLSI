@@ -1,11 +1,11 @@
-package multiplier;
+package imac;
 // Package Imports
 import Vector :: *;
 import FIFO :: *;
 // Project Imports
 import imac_types :: *;
 
-export multiplier::*;
+export imac :: *;
 
 // `define debug_functionality
 // `define debug_pipeline
@@ -30,8 +30,8 @@ function Bit#(n) gen_sum(Bit#(n) snew_prev, Bit#(n) s, Bit#(n) cin);
 endfunction
 
 // Pipelined IMAc unit
-module mkIMAc(Ifc_IMAC#(n, m))
-    provisos(Add#(1, b__, n));
+module mkIMAc(Ifc_IMAC#(n, m));
+    // provisos(Add#(1, b__, n));
     Reg#(MultState) state <- mkReg(Idle);
     Wire#(MultState) wr_state <- mkDWire(Idle);
     Reg#(Bit#(TAdd#(n, m))) product <- mkReg(0);
@@ -128,4 +128,12 @@ module mkIMAc(Ifc_IMAC#(n, m))
     endmethod
 
 endmodule : mkIMAc
-endpackage : multiplier
+
+(*synthesize*)
+module mkIMAc64(Ifc_IMAC#(64, 64));
+    let ifc();
+    mkIMAc _temp(ifc);
+    return (ifc);
+endmodule
+
+endpackage : imac

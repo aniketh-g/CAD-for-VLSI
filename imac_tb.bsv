@@ -1,4 +1,4 @@
-import multiplier::*;
+import imac::*;
 import imac_types :: *; 
 
 (* synthesize *)
@@ -12,15 +12,15 @@ module imac_tb(Empty);
 
 	rule tb;
 		if (cntr == 1) begin
-	        imac.start(64'd2, 64'd3);
+	        imac.start(-64'd9223372036854775807, -64'd9223372036854775807);
 		end
 		else if (cntr == 2) begin
-	        imac.start(64'd3, 64'd4);
+	        imac.start(-64'd9223372036854775807, 64'd9223372036854775807);
 		end
 		else if (cntr == 3) begin
-	        imac.start(64'd4, 64'd5);
+	        imac.start(-64'd1, 64'd9223372036854775807);
 		end
-		else if (cntr == 5) begin
+		else if (cntr == 10) begin
 	        imac.start(64'd5, 64'd6);
 		end
 		if (imac.isRdy() == 1) begin
